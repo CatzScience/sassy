@@ -2,6 +2,7 @@
 
 module App where
 
+import Control.Monad.IO.Class
 import Control.Monad.Logger (runStderrLoggingT)
 import Data.String.Conversions
 
@@ -23,7 +24,9 @@ server pool =
         submitChallenge :: Submission -> Handler TestResult
         submitChallenge sub = error "TODO: implement"
         getUsers :: Handler [User]
-        getUsers = error "TODO: implement"
+        getUsers = liftIO . flip runSqlPersistMPool pool $ do
+          users <- selectList ([] :: [Filter User]) []
+          pure $ entityVal <$> users
         createUser :: User -> Handler NoContent
         createUser usr = error "TODO: implement"
         getUser :: Username -> Handler User
