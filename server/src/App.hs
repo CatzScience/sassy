@@ -28,7 +28,9 @@ server pool =
           users <- selectList ([] :: [Filter User]) []
           pure $ entityVal <$> users
         createUser :: User -> Handler NoContent
-        createUser usr = error "TODO: implement"
+        createUser usr = liftIO . flip runSqlPersistMPool pool $ do
+          userId <- insert usr
+          pure NoContent
         getUser :: Username -> Handler User
         getUser uname = error "TODO: implement"
         updateUser :: Username -> User -> Handler User
