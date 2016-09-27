@@ -25,7 +25,7 @@ type Api =
   :<|> "users" :> -- get a specific user
     Capture "username" Username :> Get '[JSON] (Maybe User)
   :<|> "users" :> -- update a specific user
-    Capture "username" Username :> ReqBody '[JSON] User :> Put '[JSON] User
+    Capture "username" Username :> ReqBody '[JSON] User :> Put '[JSON] (Maybe User)
   :<|> "users" :> -- delete a specific user
     Capture "username" Username :> Delete '[JSON] NoContent
 
