@@ -31,8 +31,10 @@ server pool =
         createUser usr = liftIO . flip runSqlPersistMPool pool $ do
           userId <- insert usr
           pure NoContent
-        getUser :: Username -> Handler User
-        getUser uname = error "TODO: implement"
+        getUser :: Username -> Handler (Maybe User)
+        getUser uname = liftIO . flip runSqlPersistMPool pool $ do
+          usr <- getBy $ UniqueUsername uname
+          pure $ entityVal <$> usr
         updateUser :: Username -> User -> Handler User
         updateUser uname usr = error "TODO: implement"
         deleteUser :: Username -> Handler NoContent

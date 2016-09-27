@@ -23,7 +23,7 @@ type Api =
     -- TODO: should return a 201 CREATED and Location header
     ReqBody '[JSON] User :> Post '[JSON] NoContent
   :<|> "users" :> -- get a specific user
-    Capture "username" Username :> Get '[JSON] User
+    Capture "username" Username :> Get '[JSON] (Maybe User)
   :<|> "users" :> -- update a specific user
     Capture "username" Username :> ReqBody '[JSON] User :> Put '[JSON] User
   :<|> "users" :> -- delete a specific user
