@@ -38,7 +38,9 @@ server pool =
         updateUser :: Username -> User -> Handler User
         updateUser uname usr = error "TODO: implement"
         deleteUser :: Username -> Handler NoContent
-        deleteUser uname = error "TODO: implement"
+        deleteUser uname = liftIO . flip runSqlPersistMPool pool $ do
+          deleteBy $ UniqueUsername uname
+          pure NoContent
 
 app :: ConnectionPool -> Application
 app pool = serve api $ server pool
