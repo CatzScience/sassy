@@ -26,7 +26,7 @@ type Api =
   :<|> "users" :> -- update a specific user
     Capture "username" Username :> ReqBody '[JSON] User :> Put '[JSON] (Maybe User)
   :<|> "users" :> -- delete a specific user
-    Capture "username" Username :> Delete '[JSON] NoContent
+    Capture "username" Username :> DeleteNoContent '[JSON] NoContent
 
 api :: Proxy Api
 api = Proxy
