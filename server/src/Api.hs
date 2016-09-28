@@ -18,6 +18,7 @@ type Api =
   :<|> "challenges" :> -- get a specific challenge
     Capture "challengeId" ChallengeId :> Get '[JSON] Challenge
   :<|> "users" :> -- get a list of users
+    -- TODO: query params on returned data
     Get '[JSON] [User]
   :<|> "users" :> -- create a user
     ReqBody '[JSON] User :> PostCreated '[JSON] (Headers '[Header "Location" Text] User)
