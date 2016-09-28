@@ -18,16 +18,16 @@ type Api =
   :<|> "challenges" :> -- get a specific challenge
     Capture "challengeId" ChallengeId :> Get '[JSON] Challenge
   :<|> "users" :> -- get a list of users
+    -- TODO: query params on returned data
     Get '[JSON] [User]
   :<|> "users" :> -- create a user
-    -- TODO: should return a 201 CREATED and Location header
-    ReqBody '[JSON] User :> Post '[JSON] NoContent
+    ReqBody '[JSON] User :> PostCreated '[JSON] (Headers '[Header "Location" Text] User)
   :<|> "users" :> -- get a specific user
-    Capture "username" Username :> Get '[JSON] User
+    Capture "username" Username :> Get '[JSON] (Maybe User)
   :<|> "users" :> -- update a specific user
-    Capture "username" Username :> ReqBody '[JSON] User :> Put '[JSON] User
+    Capture "username" Username :> ReqBody '[JSON] User :> Put '[JSON] (Maybe User)
   :<|> "users" :> -- delete a specific user
-    Capture "username" Username :> Delete '[JSON] NoContent
+    Capture "username" Username :> DeleteNoContent '[JSON] NoContent
 
 api :: Proxy Api
 api = Proxy
