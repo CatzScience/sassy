@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 
 module App where
@@ -5,6 +7,7 @@ module App where
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runStderrLoggingT)
 import Data.String.Conversions
+import Data.Text hiding (replace)
 
 import Database.Persist.Sqlite
 import Network.Wai.Handler.Warp as Warp
@@ -27,10 +30,11 @@ server pool =
         getUsers = liftIO . flip runSqlPersistMPool pool $ do
           users <- selectList ([] :: [Filter User]) []
           pure $ entityVal <$> users
-        createUser :: User -> Handler NoContent
+        createUser :: User -> Handler (Headers '[Header "Location" Text] User)
         createUser usr = liftIO . flip runSqlPersistMPool pool $ do
+          -- TODO: handle already exists exception
           userId <- insert usr
-          pure NoContent
+          pure $ addHeader ("/users/" <> userUsername usr) usr
         getUser :: Username -> Handler (Maybe User)
         getUser uname = liftIO . flip runSqlPersistMPool pool $ do
           usr <- getBy $ UniqueUsername uname

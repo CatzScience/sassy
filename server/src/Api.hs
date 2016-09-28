@@ -20,8 +20,7 @@ type Api =
   :<|> "users" :> -- get a list of users
     Get '[JSON] [User]
   :<|> "users" :> -- create a user
-    -- TODO: should return a 201 CREATED and Location header
-    ReqBody '[JSON] User :> Post '[JSON] NoContent
+    ReqBody '[JSON] User :> PostCreated '[JSON] (Headers '[Header "Location" Text] User)
   :<|> "users" :> -- get a specific user
     Capture "username" Username :> Get '[JSON] (Maybe User)
   :<|> "users" :> -- update a specific user
