@@ -4,10 +4,16 @@
 
 module App where
 
+import Control.Monad 
 import Control.Monad.IO.Class
 import Control.Monad.Logger (runStderrLoggingT)
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.Except
+import Data.Maybe
 import Data.String.Conversions
-import Data.Text hiding (replace)
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Encoding as TLE
 
 import Database.Persist.Sqlite
 import Network.Wai.Handler.Warp as Warp
@@ -30,10 +36,14 @@ server pool =
         getUsers = liftIO . flip runSqlPersistMPool pool $ do
           users <- selectList ([] :: [Filter User]) []
           pure $ entityVal <$> users
-        createUser :: User -> Handler (Headers '[Header "Location" Text] User)
-        createUser usr = liftIO . flip runSqlPersistMPool pool $ do
-          -- TODO: handle already exists exception
-          userId <- insert usr
+        createUser :: User -> Handler (Headers '[Header "Location" T.Text] User)
+        createUser usr = mapExceptT (`runSqlPersistMPool` pool) $ do
+          exists <- lift . getBy . UniqueUsername $ userUsername usr
+          when (isJust exists) $ throwE err409
+            {errBody = "User "
+              <> TLE.encodeUtf8 (TL.fromStrict $ userUsername usr)
+              <> " exists"}
+          userId <- lift $ insert usr
           pure $ addHeader ("/users/" <> userUsername usr) usr
         getUser :: Username -> Handler (Maybe User)
         getUser uname = liftIO . flip runSqlPersistMPool pool $ do
